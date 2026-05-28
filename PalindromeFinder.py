@@ -42,6 +42,7 @@ def check_user_words():
     # 3. Display the final result
     print(f"\nYour words ({len(words_list)}): {words_list}")
     print(f"Are ALL entered palindromes? {yes_no}")
+    print("\n----PALINDROMES OR NOT---")
     if palindromes:
         print(f"Palindrome(s) ({len(palindromes)}): {palindromes}")
     if not_palindromes:
@@ -52,8 +53,8 @@ def check_user_words():
         print(f"Combined (Space): {combined_with_space_display}")
         print(f"Combined (No Space): {combined_no_space_display}")
     
-    print(f"Combined without spaces is a palindrome? {'Yes' if combined_no_space_is_pal else 'No'}")
-    print(f"Combined with spaces is a palindrome? {'Yes' if combined_with_space_is_pal else 'No'}")
+    print(f"\nCombined without spaces is a palindrome? {'Yes' if combined_no_space_is_pal else 'No'}")
+    print(f"Combined with spaces is a palindrome? {'Yes' if combined_with_space_is_pal else 'No'}\n")
     
     return all_are_palindromes
 
