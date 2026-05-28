@@ -212,15 +212,15 @@ def main():
                         else:
                             factors = entry['factors']
                             if num == 0:
-                                print(f"{i}. 0 (Factor Undefined")
+                                print(f"{i}. 0 (Factor Undefined)")
                             else:
-                                print(f"{i}. {num}: (NP - Factors: {factors})")
+                                print(f"{i}. {num} (NP - Factors: {factors})")
                     elif kind == 'invalid_decimal':
                         print(f"{i}. '{raw}' (Invalid - Non-integer Decimal)")
                     else:
                         print(f"{i}. '{raw}' (Invalid input)")
 
-            print("\nGoodbye.")
+            print("\nEND OF LINE.")
             break
 
         kind, val = parse_input(user_input)
