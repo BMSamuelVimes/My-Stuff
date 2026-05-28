@@ -208,17 +208,17 @@ def main():
                     if kind == 'int':
                         num = entry['value']
                         if entry['result'] == 'prime':
-                            print(f"{i}. {num}: PRIME")
+                            print(f"{i}. {num} (P)")
                         else:
                             factors = entry['factors']
                             if num == 0:
-                                print(f"{i}. 0: factor undefined")
+                                print(f"{i}. 0 (Factor Undefined")
                             else:
-                                print(f"{i}. {num}: NOT PRIME - Factors: {factors}")
+                                print(f"{i}. {num}: (NP - Factors: {factors})")
                     elif kind == 'invalid_decimal':
-                        print(f"{i}. '{raw}': Invalid (Non-integer Decimal)")
+                        print(f"{i}. '{raw}' (Invalid - Non-integer Decimal)")
                     else:
-                        print(f"{i}. '{raw}': Invalid input")
+                        print(f"{i}. '{raw}' (Invalid input)")
 
             print("\nGoodbye.")
             break
