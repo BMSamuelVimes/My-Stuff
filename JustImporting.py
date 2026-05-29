@@ -25,7 +25,7 @@ rand_lbl = tk.Label(root, text="", font=big_font, fg="blue")
 rand_lbl.grid(column=0, row=2, columnspan=2, pady=(0,10), sticky="ew", padx=10)
 
 # Listbox to show history of generated numbers
-history_box = tk.Listbox(root, height=6, font=("Arial", 14), justify="left")
+history_box = tk.Listbox(root, height=6, font=("Helvetica", 14), justify="left")
 history_box.grid(column=0, row=3, columnspan=2, sticky="nsew", padx=10, pady=(0,10))
 # let the history expand vertically
 root.rowconfigure(3, weight=1)
