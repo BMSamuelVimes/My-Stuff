@@ -1,6 +1,8 @@
+######### BASE RANDOM COUNT
 import tkinter as tk
 import random
 import tkinter.font as tkfont
+from tkinter import ttk
 
 root = tk.Tk()
 root.title("Welcome to Thundahdome!")
@@ -24,10 +26,24 @@ big_font = tkfont.Font(family = "Bauhaus 93", size=55, weight = "bold", slant="i
 rand_lbl = tk.Label(root, text="", font=big_font, fg="blue")
 rand_lbl.grid(column=0, row=2, columnspan=2, pady=(0,10), sticky="ew", padx=10)
 
-# Listbox to show history of generated numbers
-history_box = tk.Listbox(root, height=6, font=("Helvetica", 14), justify="left")
-history_box.grid(column=0, row=3, columnspan=2, sticky="nsew", padx=10, pady=(0,10))
-# let the history expand vertically
+
+header_font = tkfont.Font(family="Helvetica", size=12, weight="bold")
+row_font = tkfont.Font(family="Rockwell", size=10, weight= "bold")
+# col2_font = tkfont.Font(family="Rockwell", size=10, weight="bold") ######
+style = ttk.Style()
+style.configure("Custom.Treeview.Heading", font=header_font)
+style.configure("Custom.Treeview", font=row_font) 
+
+columns = ("#1", "#2")
+history_tree = ttk.Treeview(root, columns=columns, show="headings", style="Custom.Treeview", height = 6)
+history_tree.heading("#1", text= "THE NUMBER")
+history_tree.heading("#2", text="IS DUPE?")
+history_tree.column("#1", width=300, anchor="w")
+history_tree.column("#2", width=60, anchor="w")
+# history_tree.tag_configure("col2_style", foreground="green", font=col2_font) ######
+
+history_tree.grid(column=0, row=3, columnspan=2, sticky="nsew", padx=10, pady=(0,10))
+
 root.rowconfigure(3, weight=1)
 
 btn_font2 = tkfont.Font(family = "Arial Black", size=10)
@@ -38,7 +54,9 @@ def do_reset():
     history.clear()
     lbl.configure(text = "HERE'S A BUTTON!!\nIt's down there but you can see that.")
     rand_lbl.configure(text = "")
-    history_box.delete(0, tk.END)
+    for item in history_tree.get_children():
+        history_tree.delete(item)
+    # history_box.delete(0, tk.END)
     reset_btn.grid_forget()
 
 reset_btn.configure(command = do_reset)
@@ -51,21 +69,27 @@ def clicked():
     counts = {}
     for n in history:
         counts[n] = counts.get(n, 0) + 1
-
-    # history.append(rand)
-    # history_box.insert(0, f"{len(history)}: {rand}")
     
-    lbl.configure(text=f"Clickity click! ({click_count.get()} clicks.)")
+    lbl.configure(text=f"Clickity click! ({click_count.get()} clicks.)\n")
     rand_lbl.configure(text=str(rand))
-    # update listbox (most recent at top)
-    
-    history_box.delete(0, tk.END)
+
+    for item in history_tree.get_children():
+        history_tree.delete(item)
+
+    # history_box.delete(0, tk.END)
+    # width = 60
+    # total = len(history) + 1
     for i, val in enumerate(history, start=1):
+        # idx = i - 1
         occ = counts[val]
-        if occ == 1:
-            history_box.insert(tk.END, f"{i}: {val}")
-        else:
-            history_box.insert(tk.END, f"{i}: {val} (DUPE - {occ})")
+        val_text = "" if occ==1 else f"\u2461 {occ}"
+        history_tree.insert("", tk.END, values=(f"{i}: {val}", val_text))
+        # history_tree.insert("", tk.END, values=(f"{i}: {val}", val_text), tags=("col2_style",)) CHANGE THE COLOR OF THE COLOMNS FONT
+ 
+        # if occ == 1:
+        #     history_box.insert(tk.END, base)
+        # else:
+        #     history_box.insert(tk.END, f"{base:<{width}} (\u2461 {occ})")
 
     if click_count.get() == 1:
         # reset_btn.grid(column = 0, row = 5, columnspan = 2, pady = (0, 10))
@@ -74,6 +98,86 @@ def clicked():
 btn.configure(command=clicked)
 
 root.mainloop()
+
+# ######### BASE RANDOM COUNT
+# import tkinter as tk
+# import random
+# import tkinter.font as tkfont
+
+# root = tk.Tk()
+# root.title("Welcome to Thundahdome!")
+# root.geometry('480x320')
+
+# # allow centering/stretch
+# root.columnconfigure(0, weight=1)
+# root.columnconfigure(1, weight=1)
+
+# click_count = tk.IntVar(value=0)
+# history = []  # recorded numbers
+
+# lbl = tk.Label(root, text="HERE'S A BUTTON!!\nIt's down there but you can see that.")
+# lbl.grid(column=0, row=0, columnspan=2, pady=(10,0))
+
+# btn_font = tkfont.Font(family = "Bauhaus 93", size=10)
+# btn = tk.Button(root, text="CLICK IT!", fg="purple", font = btn_font)
+# btn.grid(column=0, row=4, columnspan=2, pady=10)
+
+# big_font = tkfont.Font(family = "Bauhaus 93", size=55, weight = "bold", slant="italic")
+# rand_lbl = tk.Label(root, text="", font=big_font, fg="blue")
+# rand_lbl.grid(column=0, row=2, columnspan=2, pady=(0,10), sticky="ew", padx=10)
+
+# # Listbox to show history of generated numbers
+# history_box = tk.Listbox(root, height=6, font=("Helvetica", 14), justify="left")
+# history_box.grid(column=0, row=3, columnspan=2, sticky="nsew", padx=10, pady=(0,10))
+# # let the history expand vertically
+# root.rowconfigure(3, weight=1)
+
+# btn_font2 = tkfont.Font(family = "Arial Black", size=10)
+# reset_btn = tk.Button(root, text="RESET", fg="red", font=btn_font2)
+
+# def do_reset():
+#     click_count.set(0)
+#     history.clear()
+#     lbl.configure(text = "HERE'S A BUTTON!!\nIt's down there but you can see that.")
+#     rand_lbl.configure(text = "")
+#     history_box.delete(0, tk.END)
+#     reset_btn.grid_forget()
+
+# reset_btn.configure(command = do_reset)
+
+
+# def clicked():
+#     click_count.set(click_count.get() + 1)
+#     rand = random.randint(1, 100)
+#     history.append(rand)
+#     counts = {}
+#     for n in history:
+#         counts[n] = counts.get(n, 0) + 1
+
+#     # history.append(rand)
+#     # history_box.insert(0, f"{len(history)}: {rand}")
+    
+#     lbl.configure(text=f"Clickity click! ({click_count.get()} clicks.)")
+#     rand_lbl.configure(text=str(rand))
+#     # update listbox (most recent at top)
+    
+#     history_box.delete(0, tk.END)
+#     width = 60
+#     for i, val in enumerate(history, start=1):
+#         occ = counts[val]
+#         base = f"{i}: {val}"
+#         if occ == 1:
+#             history_box.insert(tk.END, base)
+#         else:
+#             history_box.insert(tk.END, f"{base:<{width}} (\u2461 {occ})")
+
+#     if click_count.get() == 1:
+#         # reset_btn.grid(column = 0, row = 5, columnspan = 2, pady = (0, 10))
+#         reset_btn.grid(column = 1, row = 4, padx = (0, 10), pady = 10, sticky = "e")
+
+# btn.configure(command=clicked)
+
+# root.mainloop()
 
 # #### History display
 # import tkinter as tk
