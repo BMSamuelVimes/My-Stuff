@@ -53,7 +53,7 @@
 
 # root.mainloop()
 
-############### PERCENTAGE CALCULATOR
+############### JUST PERCENT CALCULATOR
 # import tkinter as tk
 # from tkinter import ttk, font, StringVar, messagebox
 
@@ -154,6 +154,7 @@
 #     PercentApp().mainloop()
 
 
+############ PERCENT CALCULATOR AND NUMBER PERCENTAGE OF NUMBER CALCULATOR 
 import tkinter as tk
 from tkinter import ttk, font, StringVar, messagebox
 
@@ -192,19 +193,19 @@ class PercentApp(tk.Tk):
         for r in range(6):
             frm.grid_rowconfigure(r, weight=1)
 
-        ttk.Label(frm, text="VALUE (A):").grid(column=0, row=0, sticky="w", padx=(0,8))
+        ttk.Label(frm, text="VALUE:").grid(column=0, row=0, sticky="w", padx=(0,8))
         self.value_entry = ttk.Entry(frm, textvariable=self.value_var)
         self.value_entry.grid(column=1, row=0, sticky="ew")
 
-        ttk.Label(frm, text="BASE (B):").grid(column=0, row=1, sticky="w", padx=(0,8))
+        ttk.Label(frm, text="PERCENT % (A)\nBASE (B):").grid(column=0, row=1, sticky="w", padx=(0,8))
         self.percent_entry = ttk.Entry(frm, textvariable=self.percent_var)
         self.percent_entry.grid(column=1, row=1, sticky="ew")
 
         # Mode selection
         modes_frm = ttk.Frame(frm)
         modes_frm.grid(column=0, row=2, columnspan=2, pady=(6,0))
-        rb1 = ttk.Radiobutton(modes_frm, text="Calculate A × (percent/100)", variable=self.mode_var, value="part_of")
-        rb2 = ttk.Radiobutton(modes_frm, text="Calculate percent: A is what % of B", variable=self.mode_var, value="percent_of")
+        rb1 = ttk.Radiobutton(modes_frm, text="VALUE × (%/100)", variable=self.mode_var, value="part_of")
+        rb2 = ttk.Radiobutton(modes_frm, text="A is what % of B", variable=self.mode_var, value="percent_of")
         rb1.grid(column=0, row=0, padx=(0,8))
         rb2.grid(column=1, row=0)
 
@@ -225,7 +226,7 @@ class PercentApp(tk.Tk):
         try:
             a = float(self.value_var.get())
         except ValueError:
-            messagebox.showerror("Invalid input", "Please enter a numeric VALUE (A).")
+            messagebox.showerror("Invalid input", "Please enter a numeric VALUE.")
             return
 
         # Mode: part_of => result = A * (percent/100) where percent is entered in percent_var
@@ -233,7 +234,7 @@ class PercentApp(tk.Tk):
             try:
                 percent = float(self.percent_var.get())
             except ValueError:
-                messagebox.showerror("Invalid input", "Please enter a numeric PERCENT.")
+                messagebox.showerror("Invalid input", "Please enter a numeric PERCENT (%).")
                 return
             result = a * (percent / 100)
             self.result_var.set(f"{result:.6g}")
