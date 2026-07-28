@@ -1,125 +1,206 @@
 # ############ PERCENT CALCULATOR AND NUMBER PERCENTAGE OF NUMBER CALCULATOR 
-# import tkinter as tk
-# from tkinter import ttk, font, StringVar, messagebox
+# ############ PERCENT CALCULATOR AND NUMBER PERCENTAGE OF NUMBER CALCULATOR RESULTS CENTERED XXXXXHAS ISSUES!!!!!XXXXXX
+import tkinter as tk
+from tkinter import ttk, font, StringVar, messagebox
 
-# class PercentApp(tk.Tk):
-#     def __init__(self):
-#         super().__init__()
-#         self.title("PERCENTAGE CALCULATOR")
-#         self.minsize(360, 220)
+class PercentApp(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("PERCENTAGE CALCULATOR")
+        self.minsize(360, 220)
 
-#         self.value_var = StringVar()
-#         self.percent_var = StringVar()
-#         self.result_var = StringVar()
-#         self.mode_var = StringVar(value="part_of")  # "part_of" or "percent_of"
+        self.value_var = StringVar()
+        self.percent_var = StringVar()
+        self.result_var = StringVar()
+        self.formula_var = StringVar()
 
-#         # base font sizes; will be scaled
-#         self.base_size = 12
-#         self.app_font = font.Font(family="Segoe UI", size=self.base_size)
-#         self.label_font = font.Font(family="Segoe UI", size=self.base_size)
-#         self.entry_font = font.Font(family="Segoe UI", size=self.base_size)
+        self.mode_var = StringVar(value="part_of")  # "part_of" or "percent_of"
 
-#         self.style = ttk.Style(self)
-#         self.style.configure("TLabel", font=self.label_font)
-#         self.style.configure("TButton", font=self.app_font)
-#         self.style.configure("TEntry", font=self.entry_font)
-#         self.style.configure("TRadiobutton", font=self.app_font)
+        # base font sizes; will be scaled
+        self.base_size = 12
+        self.app_font = font.Font(family="Segoe UI", size=self.base_size)
+        self.label_font = font.Font(family="Segoe UI", size=self.base_size)
+        self.entry_font = font.Font(family="Segoe UI", size=self.base_size)
 
-#         frm = ttk.Frame(self, padding=12)
-#         frm.grid(sticky="nsew")
-#         # make the frame expand
-#         self.grid_rowconfigure(0, weight=1)
-#         self.grid_columnconfigure(0, weight=1)
+        # enlarged/bold font ONLY for the result
+        self.result_base_size = int(self.base_size * 3)
+        self.result_font = font.Font(family="Segoe UI", size=self.result_base_size, weight="bold")
 
-#         # labels column stays tight, inputs column expands
-#         frm.grid_columnconfigure(0, weight=0)
-#         frm.grid_columnconfigure(1, weight=1)
-#         for r in range(6):
-#             frm.grid_rowconfigure(r, weight=1)
+        # Button styles (color differs for CALCULATE vs CLEAR)
+        self.style = ttk.Style(self)
 
-#         ttk.Label(frm, text="VALUE (A):").grid(column=0, row=0, sticky="w", padx=(0,8))
-#         self.value_entry = ttk.Entry(frm, textvariable=self.value_var)
-#         self.value_entry.grid(column=1, row=0, sticky="ew")
+        self.style.configure("Calc.TButton", font=self.app_font)
+        self.style.configure("Clear.TButton", font=self.app_font, foreground="red", background="#d32f2f")
 
-#         ttk.Label(frm, text="\u0332".join("PERCENT % (B)") + "\nTOTAL # (C):").grid(column=0, row=1, sticky="w", padx=(0,8))
-#         self.percent_entry = ttk.Entry(frm, textvariable=self.percent_var)
-#         self.percent_entry.grid(column=1, row=1, sticky="ew")
+        # ttk on some platforms ignores background for default themes;
+        # still, configure works where supported.
+        try:
+            self.style.map("Calc.TButton", background=[("active", "#e3e3e3")])
+            self.style.map("Clear.TButton", background=[("active", "#b71c1c")])
+        except tk.TclError:
+            pass
 
-#         # Mode selection
-#         modes_frm = ttk.Frame(frm)
-#         modes_frm.grid(column=0, row=2, columnspan=2, pady=(6,0))
-#         rb1 = ttk.Radiobutton(modes_frm, text="WHAT IS (B)% OF (A)\n-VALUE (A) × (PERCENT %(B)/100)-", variable=self.mode_var, value="part_of")
-#         rb2 = ttk.Radiobutton(modes_frm, text="VALUE (A) is what % of BASE # (C)\n-(A / B) * 100-", variable=self.mode_var, value="percent_of")
-#         rb1.grid(column=0, row=0, padx=(0,8))
-#         rb2.grid(column=1, row=0)
+        frm = ttk.Frame(self, padding=12)
+        frm.grid(sticky="nsew")
 
-#         # Centered button spanning both columns
-#         self.calc_btn = ttk.Button(frm, text="CALCULATE", command=self.calculate)
-#         self.calc_btn.grid(column=0, row=3, columnspan=2, pady=(8,0))
-#         self.calc_btn.grid_configure(padx=(80,80))
+        # make the frame expand
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
-#         ttk.Label(frm, text="RESULT:").grid(column=0, row=4, sticky="w", padx=(0,8), pady=(8,0))
-#         self.result_entry = ttk.Entry(frm, textvariable=self.result_var, state="readonly")
-#         self.result_entry.grid(column=1, row=4, sticky="ew", pady=(8,0))
+        # labels column stays tight, inputs column expands
+        frm.grid_columnconfigure(0, weight=0)
+        frm.grid_columnconfigure(1, weight=1)
 
-#         self.bind("<Configure>", self._on_resize)
-#         self.bind("<Return>", lambda e: self.calculate())
+        # We now have 7 rows (0..6)
+        for r in range(7):
+            frm.grid_rowconfigure(r, weight=1)
 
-#     def calculate(self):
-#         mode = self.mode_var.get()
-#         try:
-#             a = float(self.value_var.get())
-#         except ValueError:
-#             messagebox.showerror("Invalid input", "Please enter a numeric VALUE.")
-#             return
+        ttk.Label(frm, text="VALUE (A):").grid(column=0, row=0, sticky="w", padx=(0, 8))
+        self.value_entry = ttk.Entry(frm, textvariable=self.value_var)
+        self.value_entry.grid(column=1, row=0, sticky="ew")
 
-#         # Mode: part_of => result = A * (percent/100) where percent is entered in percent_var
-#         if mode == "part_of":
-#             try:
-#                 percent = float(self.percent_var.get())
-#             except ValueError:
-#                 messagebox.showerror("Invalid input", "Please enter a numeric PERCENT (%).")
-#                 return
-#             result = a * (percent / 100)
-#             self.result_var.set(f"{result:.6g}")
-#             return
+        ttk.Label(
+            frm,
+            text="\u0332".join("PERCENT % (B)") + "\nTOTAL # (C):"
+        ).grid(column=0, row=1, sticky="w", padx=(0, 8))
 
-#         # Mode: percent_of => percent = (A / B) * 100
-#         if mode == "percent_of":
-#             try:
-#                 b = float(self.percent_var.get())
-#             except ValueError:
-#                 messagebox.showerror("Invalid input", "Please enter a numeric BASE (B).")
-#                 return
-#             if b == 0:
-#                 messagebox.showerror("Math error", "BASE (B) cannot be zero.")
-#                 return
-#             percent = (a / b) * 100
-#             self.result_var.set(f"{percent:.6g} %")
-#             return
+        self.percent_entry = ttk.Entry(frm, textvariable=self.percent_var)
+        self.percent_entry.grid(column=1, row=1, sticky="ew")
 
-#     def _on_resize(self, event):
-#         new_size = max(8, int(self.winfo_height() / 18))
-#         if new_size != self.base_size:
-#             self.base_size = new_size
-#             self.app_font.configure(size=new_size)
-#             self.label_font.configure(size=new_size)
-#             self.entry_font.configure(size=new_size)
-#             # update ttk styles
-#             self.style.configure("TButton", padding=(6, max(2, new_size//3)))
-#             self.style.configure("TEntry", font=self.entry_font)
-#             self.style.configure("TLabel", font=self.label_font)
-#             self.style.configure("TRadiobutton", font=self.app_font)
-#             # adjust entry internal padding (vertical) so the widget height scales
-#             ipady = max(2, new_size // 4)
-#             self.value_entry.grid_configure(ipady=ipady)
-#             self.percent_entry.grid_configure(ipady=ipady)
-#             self.result_entry.grid_configure(ipady=ipady)
-#             # adjust button padding to keep visual centering
-#             self.calc_btn.grid_configure(padx=(max(10, new_size*4), max(10, new_size*4)))
+        # Mode selection
+        modes_frm = ttk.Frame(frm)
+        modes_frm.grid(column=0, row=2, columnspan=2, pady=(6, 0), sticky="ew")
 
-# if __name__ == "__main__":
-#     PercentApp().mainloop()
+        rb1 = ttk.Radiobutton(
+            modes_frm,
+            text="WHAT IS (B)% OF (A)",
+            variable=self.mode_var,
+            value="part_of"
+        )
+        rb2 = ttk.Radiobutton(
+            modes_frm,
+            text="VALUE (A) is what % of TOTAL # (C)",
+            variable=self.mode_var,
+            value="percent_of"
+        )
+        rb1.grid(column=0, row=0, padx=(0, 8))
+        rb2.grid(column=1, row=0)
+
+        # Button switches between Calculate and Clear (style changes too)
+        self.calc_btn = ttk.Button(
+            frm,
+            text="CALCULATE",
+            command=self.calculate_or_clear,
+            style="Calc.TButton"
+        )
+        self.calc_btn.grid(column=0, row=3, columnspan=2, pady=(8, 0))
+        self.calc_btn.grid_configure(padx=(80, 80))
+
+        # Output area
+        self.formula_label = ttk.Label(
+            frm,
+            textvariable=self.formula_var,
+            anchor="center",
+            justify="center",
+            wraplength=0
+        )
+        self.formula_label.grid(column=0, row=4, columnspan=2, sticky="nsew", pady=(4, 0))
+
+        self.result_label = ttk.Label(
+            frm,
+            textvariable=self.result_var,
+            anchor="center",
+            justify="center",
+            font=self.result_font
+        )
+        self.result_label.grid(column=0, row=5, columnspan=2, sticky="nsew", pady=(6, 0))
+
+        self.bind("<Configure>", self._on_resize)
+        self.bind("<Return>", lambda e: self.calculate_or_clear())
+
+        # Initialize output
+        self.formula_var.set(" ")
+        self.result_var.set(" ")
+
+    def calculate_or_clear(self):
+        if self.calc_btn.cget("text") == "CLEAR":
+            self.clear()
+        else:
+            self.calculate()
+
+    def clear(self):
+        self.value_var.set("")
+        self.percent_var.set("")
+        self.formula_var.set(" ")
+        self.result_var.set(" ")
+
+        # back to CALCULATE style/color
+        self.calc_btn.configure(text="CALCULATE", command=self.calculate_or_clear, style="Calc.TButton")
+        self.value_entry.focus_set()
+
+    def calculate(self):
+        mode = self.mode_var.get()
+
+        try:
+            a = float(self.value_var.get())
+        except ValueError:
+            messagebox.showerror("Invalid input", "Please enter a numeric VALUE.")
+            return
+
+        if mode == "part_of":
+            try:
+                percent = float(self.percent_var.get())
+            except ValueError:
+                messagebox.showerror("Invalid input", "Please enter a numeric PERCENT (%).")
+                return
+
+            result = a * (percent / 100)
+            self.formula_var.set(f"{a} × ({percent}/100)")
+            self.result_var.set(f"Result: {result:.6g}")
+
+        elif mode == "percent_of":
+            try:
+                b = float(self.percent_var.get())
+            except ValueError:
+                messagebox.showerror("Invalid input", "Please enter a numeric BASE (B).")
+                return
+
+            if b == 0:
+                messagebox.showerror("Math error", "BASE (B) cannot be zero.")
+                return
+
+            percent = (a / b) * 100
+            self.formula_var.set(f"({a}/{b}) × 100")
+            self.result_var.set(f"Result: {percent:.6g} %")
+
+        # results shown -> switch to CLEAR and update button color
+        self.calc_btn.configure(text="CLEAR", command=self.clear, style="Clear.TButton")
+
+    def _on_resize(self, event):
+        new_size = max(8, int(self.winfo_height() / 18))
+        if new_size != self.base_size:
+            self.base_size = new_size
+
+            self.app_font.configure(size=new_size)
+            self.label_font.configure(size=new_size)
+            self.entry_font.configure(size=new_size)
+
+            # update ttk styles
+            self.style.configure("Calc.TButton", font=self.app_font)
+            self.style.configure("Clear.TButton", font=self.app_font)
+
+            self.style.configure("TEntry", font=self.entry_font)
+            self.style.configure("TLabel", font=self.label_font)
+            self.style.configure("TRadiobutton", font=self.app_font)
+
+            ipady = max(2, new_size // 4)
+            self.value_entry.grid_configure(ipady=ipady)
+            self.percent_entry.grid_configure(ipady=ipady)
+
+            self.calc_btn.grid_configure(padx=(max(10, new_size * 4), max(10, new_size * 4)))
+
+if __name__ == "__main__":
+    PercentApp().mainloop()
 
 
 # import math
@@ -276,180 +357,3 @@
 
 # if __name__ == "__main__":
 #     PercentApp().mainloop()
-
-
-############ PERCENT CALCULATOR AND NUMBER PERCENTAGE OF NUMBER CALCULATOR RESULTS CENTERED XXXXXHAS ISSUES!!!!!XXXXXX
-import tkinter as tk
-from tkinter import ttk, font, StringVar, messagebox
-
-class PercentApp(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.title("PERCENTAGE CALCULATOR")
-        self.minsize(360, 220)
-
-        self.value_var = StringVar()
-        self.percent_var = StringVar()
-        self.result_var = StringVar()
-        self.formula_var = StringVar()
-
-        self.mode_var = StringVar(value="part_of")  # "part_of" or "percent_of"
-
-        # base font sizes; will be scaled
-        self.base_size = 12
-        self.app_font = font.Font(family="Segoe UI", size=self.base_size)
-        self.label_font = font.Font(family="Segoe UI", size=self.base_size)
-        self.entry_font = font.Font(family="Segoe UI", size=self.base_size)
-
-        self.style = ttk.Style(self)
-        self.style.configure("TLabel", font=self.label_font)
-        self.style.configure("TButton", font=self.app_font)
-        self.style.configure("TEntry", font=self.entry_font)
-        self.style.configure("TRadiobutton", font=self.app_font)
-
-        frm = ttk.Frame(self, padding=12)
-        frm.grid(sticky="nsew")
-
-        # make the frame expand
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-
-        # labels column stays tight, inputs column expands
-        frm.grid_columnconfigure(0, weight=0)
-        frm.grid_columnconfigure(1, weight=1)
-
-        # We now have 7 rows (0..6)
-        for r in range(7):
-            frm.grid_rowconfigure(r, weight=1)
-
-        ttk.Label(frm, text="VALUE (A):").grid(column=0, row=0, sticky="w", padx=(0, 8))
-        self.value_entry = ttk.Entry(frm, textvariable=self.value_var)
-        self.value_entry.grid(column=1, row=0, sticky="ew")
-
-        ttk.Label(
-            frm,
-            text="\u0332".join("PERCENT % (B)") + "\nTOTAL # (C):"
-        ).grid(column=0, row=1, sticky="w", padx=(0, 8))
-
-        self.percent_entry = ttk.Entry(frm, textvariable=self.percent_var)
-        self.percent_entry.grid(column=1, row=1, sticky="ew")
-
-        # Mode selection
-        modes_frm = ttk.Frame(frm)
-        modes_frm.grid(column=0, row=2, columnspan=2, pady=(6, 0), sticky="ew")
-
-        rb1 = ttk.Radiobutton(
-            modes_frm,
-            text="WHAT IS (B)% OF (A)\n-VALUE (A) × (PERCENT %(B)/100)-",
-            variable=self.mode_var,
-            value="part_of"
-        )
-        rb2 = ttk.Radiobutton(
-            modes_frm,
-            text="VALUE (A) is what % of BASE # (C)\n-(A / B) * 100-",
-            variable=self.mode_var,
-            value="percent_of"
-        )
-        rb1.grid(column=0, row=0, padx=(0, 8))
-        rb2.grid(column=1, row=0)
-
-        # Centered button spanning both columns
-        self.calc_btn = ttk.Button(frm, text="CALCULATE", command=self.calculate)
-        self.calc_btn.grid(column=0, row=3, columnspan=2, pady=(8, 0))
-        self.calc_btn.grid_configure(padx=(80, 80))
-
-        # Output area: center bottom (formula + result)
-        # Row 4: formula (center)
-        self.formula_label = ttk.Label(
-            frm,
-            textvariable=self.formula_var,
-            anchor="center",
-            justify="center",
-            wraplength=320
-        )
-        self.formula_label.grid(column=0, row=4, columnspan=2, sticky="nsew", pady=(4, 0))
-
-        # Row 5: answer (center) - use a label for true center alignment
-        self.result_label = ttk.Label(
-            frm,
-            textvariable=self.result_var,
-            anchor="center",
-            justify="center"
-        )
-        self.result_label.grid(column=0, row=5, columnspan=2, sticky="nsew", pady=(6, 0))
-
-        # Optional spacer rows (so it sits at bottom visually)
-        # Row 6 already exists (weight=1), keeping output toward bottom.
-
-        self.bind("<Configure>", self._on_resize)
-        self.bind("<Return>", lambda e: self.calculate())
-
-        # Initialize output
-        self.formula_var.set(" ")
-        self.result_var.set(" ")
-
-    def calculate(self):
-        mode = self.mode_var.get()
-
-        try:
-            a = float(self.value_var.get())
-        except ValueError:
-            messagebox.showerror("Invalid input", "Please enter a numeric VALUE.")
-            return
-
-        if mode == "part_of":
-            try:
-                percent = float(self.percent_var.get())
-            except ValueError:
-                messagebox.showerror("Invalid input", "Please enter a numeric PERCENT (%).")
-                return
-
-            # result = A * (percent/100)
-            result = a * (percent / 100)
-            self.formula_var.set(f"Formula: A × (B/100) = {a} × ({percent}/100)")
-            self.result_var.set(f"Result: {result:.6g}")
-
-        elif mode == "percent_of":
-            try:
-                b = float(self.percent_var.get())
-            except ValueError:
-                messagebox.showerror("Invalid input", "Please enter a numeric BASE (B).")
-                return
-
-            if b == 0:
-                messagebox.showerror("Math error", "BASE (B) cannot be zero.")
-                return
-
-            # percent = (A / B) * 100
-            percent = (a / b) * 100
-            self.formula_var.set(f"Formula: (A/B) × 100 = ({a}/{b}) × 100")
-            self.result_var.set(f"Result: {percent:.6g} %")
-
-    def _on_resize(self, event):
-        new_size = max(8, int(self.winfo_height() / 18))
-        if new_size != self.base_size:
-            self.base_size = new_size
-            self.app_font.configure(size=new_size)
-            self.label_font.configure(size=new_size)
-            self.entry_font.configure(size=new_size)
-
-            # update ttk styles
-            self.style.configure("TButton", padding=(6, max(2, new_size // 3)))
-            self.style.configure("TEntry", font=self.entry_font)
-            self.style.configure("TLabel", font=self.label_font)
-            self.style.configure("TRadiobutton", font=self.app_font)
-
-            # adjust entry internal padding (vertical) so the widget height scales
-            ipady = max(2, new_size // 4)
-            self.value_entry.grid_configure(ipady=ipady)
-            self.percent_entry.grid_configure(ipady=ipady)
-
-            # keep button visually centered
-            self.calc_btn.grid_configure(padx=(max(10, new_size * 4), max(10, new_size * 4)))
-
-            # also make output text scale nicely
-            self.formula_label.configure(font=self.label_font)
-            self.result_label.configure(font=self.app_font)
-
-if __name__ == "__main__":
-    PercentApp().mainloop()
